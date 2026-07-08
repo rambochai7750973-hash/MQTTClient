@@ -45,11 +45,27 @@ jobs:
           java -jar gradle/wrapper/gradle-wrapper.jar --version || echo "Wrapper JAR failed"
 
       - name: Build with Gradle
+        id: gradle_build
+        continue-on-error: true
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace --info
+          ./gradlew assembleDebug --no-daemon --stacktrace --info 2>&1 | tee gradle_output.txt
+
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: gradle_output.txt
+
+      - name: Check build status
+        if: steps.gradle_build.outcome != 'success'
+        run: |
+          echo "Build failed - checking logs..."
+          cat gradle_output.txt | tail -50
 
       - name: Upload APK
+        if: steps.gradle_build.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
