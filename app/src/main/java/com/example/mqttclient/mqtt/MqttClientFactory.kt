@@ -1,8 +1,7 @@
 package com.example.mqttclient.mqtt
 
-import android.content.Context
 import com.example.mqttclient.data.model.ConnectionConfig
-import org.eclipse.paho.android.service.MqttAndroidClient
+import org.eclipse.paho.client.mqttv3.MqttClient
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -10,8 +9,9 @@ import javax.inject.Singleton
 @Singleton
 class MqttClientFactory @Inject constructor() {
 
-    fun createClient(context: Context, config: ConnectionConfig): MqttAndroidClient {
-        return MqttAndroidClient(context, config.serverUri(), config.clientId ?: generateClientId())
+    fun createClient(config: ConnectionConfig): MqttClient {
+        val clientId = config.clientId ?: generateClientId()
+        return MqttClient(config.serverUri(), clientId, null)
     }
 
     fun createConnectOptions(config: ConnectionConfig): MqttConnectOptions {

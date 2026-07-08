@@ -45,7 +45,6 @@ android {
 
 dependencies {
     // MQTT
-    implementation(libs.paho.android.service)
     implementation(libs.paho.client)
 
     // Compose

@@ -15,7 +15,6 @@ mockk = "1.13.14"
 turbine = "1.2.0"
 
 [libraries]
-paho-android-service = { module = "org.eclipse.paho:org.eclipse.paho.android.service", version.ref = "paho" }
 paho-client = { module = "org.eclipse.paho:org.eclipse.paho.client.mqttv3", version.ref = "paho" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
 compose-material3 = { module = "androidx.compose.material3:material3" }

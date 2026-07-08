@@ -1,10 +1,8 @@
 package com.example.mqttclient.mqtt
 
-import android.content.Context
 import com.example.mqttclient.data.model.ConnectionConfig
 import com.example.mqttclient.data.model.ConnectionState
 import com.example.mqttclient.data.model.MqttMessage
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -16,16 +14,16 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.eclipse.paho.client.mqttv3.MqttClient
 import org.eclipse.paho.client.mqttv3.MqttException
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class MqttManager @Inject constructor(
-    private val clientFactory: MqttClientFactory,
-    @ApplicationContext private val context: Context
+    private val clientFactory: MqttClientFactory
 ) {
-    private var client: org.eclipse.paho.android.service.MqttAndroidClient? = null
+    private var client: MqttClient? = null
     private var callbackHandler: MqttCallbackHandler? = null
     private val activeSubscriptions = mutableSetOf<String>()
 
@@ -45,7 +43,7 @@ class MqttManager @Inject constructor(
             _connectionState.value = ConnectionState.Connecting
             currentConfig = config
 
-            client = clientFactory.createClient(context, config)
+            client = clientFactory.createClient(config)
             val options = clientFactory.createConnectOptions(config)
 
             callbackHandler = MqttCallbackHandler(
@@ -83,14 +81,14 @@ class MqttManager @Inject constructor(
             )
 
             client?.setCallback(callbackHandler)
-            client?.connect(options)?.waitForCompletion(config.connectTimeoutSec * 1000L)
+            client?.connect(options)
 
-            val state = _connectionState.value
-            if (state is ConnectionState.Connected) {
-                Result.success(Unit)
-            } else {
-                Result.failure(Exception("Connection failed with state: $state"))
-            }
+            _connectionState.value = ConnectionState.Connected(
+                serverUri = config.serverUri(),
+                clientId = config.clientId ?: "auto",
+                connectedSince = System.currentTimeMillis()
+            )
+            Result.success(Unit)
         } catch (e: MqttException) {
             _connectionState.value = ConnectionState.Error(
                 reason = when (e.reasonCode) {
@@ -115,7 +113,7 @@ class MqttManager @Inject constructor(
     suspend fun disconnect(): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             _connectionState.value = ConnectionState.Disconnecting("Manual disconnect")
-            client?.disconnect()?.waitForCompletion(5000)
+            client?.disconnect(5000)
             client?.close()
             client = null
             _connectionState.value = ConnectionState.Disconnected
@@ -128,7 +126,7 @@ class MqttManager @Inject constructor(
     suspend fun subscribe(topic: String, qos: Int): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val c = client ?: return@withContext Result.failure(Exception("Not connected"))
-            c.subscribe(topic, qos)?.waitForCompletion(5000)
+            c.subscribe(topic, qos)
             activeSubscriptions.add(topic)
             Result.success(Unit)
         } catch (e: Exception) {
@@ -139,7 +137,7 @@ class MqttManager @Inject constructor(
     suspend fun unsubscribe(topic: String): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val c = client ?: return@withContext Result.failure(Exception("Not connected"))
-            c.unsubscribe(topic)?.waitForCompletion(5000)
+            c.unsubscribe(topic)
             activeSubscriptions.remove(topic)
             Result.success(Unit)
         } catch (e: Exception) {
