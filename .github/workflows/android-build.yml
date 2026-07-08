@@ -37,10 +37,17 @@ jobs:
       - name: Generate Gradle Wrapper
         run: gradle wrapper --gradle-version 8.9
 
+      - name: Verify wrapper
+        run: |
+          ls -la gradlew gradlew.bat gradle/wrapper/
+          file gradlew
+          head -5 gradlew
+          java -jar gradle/wrapper/gradle-wrapper.jar --version || echo "Wrapper JAR failed"
+
       - name: Build with Gradle
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          ./gradlew assembleDebug --no-daemon --stacktrace --info
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
