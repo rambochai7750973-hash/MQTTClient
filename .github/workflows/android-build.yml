@@ -40,16 +40,22 @@ jobs:
       - name: Verify wrapper
         run: |
           ls -la gradlew gradlew.bat gradle/wrapper/
-          file gradlew
-          head -5 gradlew
           java -jar gradle/wrapper/gradle-wrapper.jar --version || echo "Wrapper JAR failed"
 
       - name: Build with Gradle
-        id: gradle_build
-        continue-on-error: true
+        id: build
         run: |
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon --stacktrace --info 2>&1 | tee gradle_output.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: Print build summary
+        if: always()
+        run: |
+          echo "=== Last 50 lines ==="
+          tail -50 gradle_output.txt
+          echo "=== APK check ==="
+          ls -la app/build/outputs/apk/debug/ 2>/dev/null || echo "No APK output"
 
       - name: Upload build logs
         if: always()
@@ -58,14 +64,7 @@ jobs:
           name: build-logs
           path: gradle_output.txt
 
-      - name: Check build status
-        if: steps.gradle_build.outcome != 'success'
-        run: |
-          echo "Build failed - checking logs..."
-          cat gradle_output.txt | tail -50
-
       - name: Upload APK
-        if: steps.gradle_build.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
