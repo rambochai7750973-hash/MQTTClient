@@ -152,9 +152,8 @@ class MqttManager @Inject constructor(
                 this.qos = qos
                 isRetained = retain
             }
-            val token = c.publish(topic, message)
-            token.waitForCompletion(5000)
-            Result.success(token.messageId)
+            c.publish(topic, message)
+            Result.success(message.id)
         } catch (e: Exception) {
             Result.failure(e)
         }
