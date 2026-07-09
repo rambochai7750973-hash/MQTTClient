@@ -14,7 +14,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import com.example.mqttclient.R
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -28,7 +30,7 @@ fun QosSelector(
         modifier = modifier.selectableGroup()
     ) {
         Text(
-            text = "QoS",
+            text = stringResource(R.string.qos),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

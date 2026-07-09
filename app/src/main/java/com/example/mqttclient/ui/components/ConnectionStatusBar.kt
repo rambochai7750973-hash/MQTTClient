@@ -25,6 +25,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.mqttclient.data.model.ConnectionState
+import androidx.compose.ui.res.stringResource
+import com.example.mqttclient.R
 import com.example.mqttclient.ui.theme.ConnectedGreen
 import com.example.mqttclient.ui.theme.ConnectingYellow
 import com.example.mqttclient.ui.theme.DisconnectedRed
@@ -37,11 +39,11 @@ fun ConnectionStatusBar(
     modifier: Modifier = Modifier
 ) {
     val (color, text) = when (state) {
-        is ConnectionState.Connected -> ConnectedGreen to "Connected"
-        is ConnectionState.Connecting -> ConnectingYellow to "Connecting"
-        is ConnectionState.Disconnecting -> ConnectingYellow to "Disconnecting"
-        is ConnectionState.Disconnected -> InactiveGrey to "Disconnected"
-        is ConnectionState.Error -> DisconnectedRed to "Error"
+        is ConnectionState.Connected -> ConnectedGreen to stringResource(R.string.connected)
+        is ConnectionState.Connecting -> ConnectingYellow to stringResource(R.string.connecting)
+        is ConnectionState.Disconnecting -> ConnectingYellow to stringResource(R.string.disconnecting)
+        is ConnectionState.Disconnected -> InactiveGrey to stringResource(R.string.disconnected)
+        is ConnectionState.Error -> DisconnectedRed to stringResource(R.string.error)
     }
 
     Card(
@@ -87,8 +89,8 @@ fun ConnectionStatusBar(
 
             Text(
                 text = when (state) {
-                    is ConnectionState.Connected -> "Disconnect"
-                    is ConnectionState.Disconnected -> "Connect"
+                    is ConnectionState.Connected -> stringResource(R.string.disconnect)
+                    is ConnectionState.Disconnected -> stringResource(R.string.connect)
                     else -> ""
                 },
                 style = MaterialTheme.typography.labelLarge,

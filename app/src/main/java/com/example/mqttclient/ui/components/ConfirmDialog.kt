@@ -5,13 +5,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.example.mqttclient.R
 
 @Composable
 fun ConfirmDialog(
     title: String,
     message: String,
-    confirmText: String = "Confirm",
-    dismissText: String = "Cancel",
+    confirmText: String = stringResource(R.string.confirm_text),
+    dismissText: String = stringResource(R.string.cancel_text),
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {

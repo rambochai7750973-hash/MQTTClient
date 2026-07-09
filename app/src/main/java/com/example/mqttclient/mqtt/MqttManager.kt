@@ -16,12 +16,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.eclipse.paho.client.mqttv3.MqttClient
 import org.eclipse.paho.client.mqttv3.MqttException
+import com.example.mqttclient.R
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class MqttManager @Inject constructor(
-    private val clientFactory: MqttClientFactory
+    private val clientFactory: MqttClientFactory,
+    private val application: android.app.Application
 ) {
     private var client: MqttClient? = null
     private var callbackHandler: MqttCallbackHandler? = null
@@ -92,17 +94,17 @@ class MqttManager @Inject constructor(
         } catch (e: MqttException) {
             _connectionState.value = ConnectionState.Error(
                 reason = when (e.reasonCode.toShort()) {
-                    MqttException.REASON_CODE_BROKER_UNAVAILABLE -> "Broker unavailable"
-                    MqttException.REASON_CODE_CLIENT_TIMEOUT -> "Connection timeout"
-                    MqttException.REASON_CODE_FAILED_AUTHENTICATION -> "Authentication failed"
-                    else -> e.message ?: "Unknown error"
+                    MqttException.REASON_CODE_BROKER_UNAVAILABLE -> application.getString(R.string.broker_unavailable)
+                    MqttException.REASON_CODE_CLIENT_TIMEOUT -> application.getString(R.string.connection_timeout)
+                    MqttException.REASON_CODE_FAILED_AUTHENTICATION -> application.getString(R.string.auth_failed)
+                    else -> e.message ?: application.getString(R.string.unknown_error)
                 },
                 throwable = e
             )
             Result.failure(e)
         } catch (e: Exception) {
             _connectionState.value = ConnectionState.Error(
-                reason = e.message ?: "Unknown error",
+                reason = e.message ?: application.getString(R.string.unknown_error),
                 throwable = e
             )
             Result.failure(e)
@@ -111,7 +113,7 @@ class MqttManager @Inject constructor(
 
     suspend fun disconnect(): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            _connectionState.value = ConnectionState.Disconnecting("Manual disconnect")
+            _connectionState.value = ConnectionState.Disconnecting(application.getString(R.string.manual_disconnect))
             client?.disconnect(5000)
             client?.close()
             client = null

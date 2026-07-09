@@ -21,7 +21,8 @@ data class PublishUiState(
     val retain: Boolean = false,
     val recentTopics: List<String> = emptyList(),
     val isPayloadHex: Boolean = false,
-    val publishResult: String? = null
+    val publishSuccess: Boolean? = null,
+    val publishError: String? = null
 )
 
 @HiltViewModel
@@ -85,7 +86,8 @@ class PublishViewModel @Inject constructor(
             val result = mqttRepository.publish(topic, payloadBytes, state.qos, state.retain)
             _uiState.update {
                 it.copy(
-                    publishResult = if (result.isSuccess) "Published ✓" else "Failed: ${result.exceptionOrNull()?.message}",
+                    publishSuccess = result.isSuccess,
+                    publishError = result.exceptionOrNull()?.message,
                     payload = if (result.isSuccess) "" else it.payload
                 )
             }
@@ -96,6 +98,6 @@ class PublishViewModel @Inject constructor(
     }
 
     fun clearResult() {
-        _uiState.update { it.copy(publishResult = null) }
+        _uiState.update { it.copy(publishSuccess = null, publishError = null) }
     }
 }

@@ -3,6 +3,7 @@ package com.example.mqttclient.ui.screen.connection
 import com.example.mqttclient.data.model.ConnectionConfig
 import com.example.mqttclient.data.repository.ConnectionRepository
 import com.example.mqttclient.data.repository.MqttRepository
+import com.example.mqttclient.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,14 +38,16 @@ data class ConnectionSettingsUiState(
     val tlsEnabled: Boolean = false,
     val tlsTrustAll: Boolean = true,
     val isLoading: Boolean = false,
-    val error: String? = null,
-    val connectResult: String? = null
+    val validationError: Boolean = false,
+    val connectSuccess: Boolean? = null,
+    val connectionError: String? = null
 )
 
 @HiltViewModel
 class ConnectionSettingsViewModel @Inject constructor(
     private val connectionRepository: ConnectionRepository,
     private val mqttRepository: MqttRepository,
+    private val application: android.app.Application,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -93,7 +96,7 @@ class ConnectionSettingsViewModel @Inject constructor(
     }
 
     fun generateClientId() {
-        _uiState.update { it.copy(clientId = "mqtt_${java.util.UUID.randomUUID().toString().take(8)}") }
+        _uiState.update { it.copy(clientId = "${application.getString(R.string.mqtt_prefix)}_${java.util.UUID.randomUUID().toString().take(8)}") }
     }
 
     fun onNameChanged(name: String) { _uiState.update { it.copy(name = name) } }
@@ -117,7 +120,7 @@ class ConnectionSettingsViewModel @Inject constructor(
         val state = _uiState.value
         val port = state.port.toIntOrNull() ?: 1883
         if (state.host.isBlank() || state.name.isBlank()) {
-            _uiState.update { it.copy(error = "Name and host are required") }
+            _uiState.update { it.copy(validationError = true) }
             return
         }
 
@@ -151,13 +154,12 @@ class ConnectionSettingsViewModel @Inject constructor(
             val result = mqttRepository.connect(config)
             _uiState.update {
                 it.copy(
-                    connectResult = if (result.isSuccess) "Connected ✓"
-                    else "Failed: ${result.exceptionOrNull()?.message}",
-                    error = result.exceptionOrNull()?.message
+                    connectSuccess = result.isSuccess,
+                    connectionError = result.exceptionOrNull()?.message
                 )
             }
         }
     }
 
-    fun clearResult() { _uiState.update { it.copy(connectResult = null, error = null) } }
+    fun clearResult() { _uiState.update { it.copy(connectSuccess = null, connectionError = null, validationError = false) } }
 }

@@ -16,7 +16,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.mqttclient.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,7 +27,7 @@ fun TopicAutoCompleteField(
     onValueChange: (String) -> Unit,
     suggestions: List<String>,
     modifier: Modifier = Modifier,
-    label: String = "Topic"
+    label: String = stringResource(R.string.topic)
 ) {
     var expanded by remember { mutableStateOf(false) }
     val filteredSuggestions = suggestions.filter { it.contains(value, ignoreCase = true) }

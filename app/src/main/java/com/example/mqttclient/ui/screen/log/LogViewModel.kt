@@ -1,10 +1,14 @@
 package com.example.mqttclient.ui.screen.log
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.mqttclient.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class LogEntry(
@@ -20,16 +24,16 @@ data class LogUiState(
 )
 
 @HiltViewModel
-class LogViewModel @Inject constructor() : ViewModel() {
+class LogViewModel @Inject constructor(
+    private val application: Application
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LogUiState())
     val uiState: StateFlow<LogUiState> = _uiState.asStateFlow()
 
-    // Log capture would be implemented here
-    // For now, provide example logs
     init {
-        addLog(LogLevel.INFO, "MQTT Client started")
-        addLog(LogLevel.DEBUG, "Ready to connect")
+        addLog(LogLevel.INFO, application.getString(R.string.log_started))
+        addLog(LogLevel.DEBUG, application.getString(R.string.log_ready))
     }
 
     fun addLog(level: LogLevel, message: String) {

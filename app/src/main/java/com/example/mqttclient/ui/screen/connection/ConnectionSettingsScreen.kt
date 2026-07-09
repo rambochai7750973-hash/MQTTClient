@@ -30,8 +30,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.example.mqttclient.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mqttclient.ui.components.QosSelector
@@ -47,10 +49,10 @@ fun ConnectionSettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Connection Settings") },
+                title = { Text(stringResource(R.string.connection_settings)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.nav_back))
                     }
                 }
             )
@@ -67,7 +69,7 @@ fun ConnectionSettingsScreen(
                 value = uiState.name,
                 onValueChange = viewModel::onNameChanged,
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Name") },
+                label = { Text(stringResource(R.string.name_label)) },
                 singleLine = true
             )
 
@@ -90,7 +92,7 @@ fun ConnectionSettingsScreen(
                     value = uiState.host,
                     onValueChange = viewModel::onHostChanged,
                     modifier = Modifier.weight(3f),
-                    label = { Text("Host") },
+                    label = { Text(stringResource(R.string.host)) },
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -98,7 +100,7 @@ fun ConnectionSettingsScreen(
                     value = uiState.port,
                     onValueChange = viewModel::onPortChanged,
                     modifier = Modifier.weight(1f),
-                    label = { Text("Port") },
+                    label = { Text(stringResource(R.string.port)) },
                     singleLine = true
                 )
             }
@@ -110,14 +112,14 @@ fun ConnectionSettingsScreen(
                     value = uiState.clientId,
                     onValueChange = viewModel::onClientIdChanged,
                     modifier = Modifier.weight(1f),
-                    label = { Text("Client ID") },
+                    label = { Text(stringResource(R.string.client_id)) },
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodySmall.copy(
                         fontFamily = FontFamily.Monospace
                     )
                 )
                 IconButton(onClick = viewModel::generateClientId) {
-                    Icon(Icons.Default.Refresh, contentDescription = "Generate")
+                    Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.generate))
                 }
             }
 
@@ -127,7 +129,7 @@ fun ConnectionSettingsScreen(
                 value = uiState.username,
                 onValueChange = viewModel::onUsernameChanged,
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Username") },
+                label = { Text(stringResource(R.string.username)) },
                 singleLine = true
             )
 
@@ -137,13 +139,13 @@ fun ConnectionSettingsScreen(
                 value = uiState.password,
                 onValueChange = viewModel::onPasswordChanged,
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Password") },
+                label = { Text(stringResource(R.string.password)) },
                 singleLine = true
             )
 
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Advanced",
+                text = stringResource(R.string.advanced),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -151,30 +153,30 @@ fun ConnectionSettingsScreen(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(checked = uiState.cleanSession, onCheckedChange = viewModel::onCleanSessionChanged)
-                Text("Clean Session")
+                Text(stringResource(R.string.clean_session))
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(checked = uiState.autoReconnect, onCheckedChange = viewModel::onAutoReconnectChanged)
-                Text("Auto Reconnect")
+                Text(stringResource(R.string.auto_reconnect))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Last Will",
+                text = stringResource(R.string.last_will),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary
             )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(checked = uiState.willEnabled, onCheckedChange = viewModel::onWillEnabledChanged)
-                Text("Enable Last Will")
+                Text(stringResource(R.string.enable_last_will))
             }
             if (uiState.willEnabled) {
                 OutlinedTextField(
                     value = uiState.willTopic,
                     onValueChange = viewModel::onWillTopicChanged,
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Will Topic") },
+                    label = { Text(stringResource(R.string.will_topic)) },
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -182,42 +184,49 @@ fun ConnectionSettingsScreen(
                     value = uiState.willPayload,
                     onValueChange = viewModel::onWillPayloadChanged,
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Will Payload") },
+                    label = { Text(stringResource(R.string.will_payload)) },
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 QosSelector(selectedQos = uiState.willQos, onQosSelected = viewModel::onWillQosChanged)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(checked = uiState.willRetain, onCheckedChange = viewModel::onWillRetainChanged)
-                    Text("Will Retain")
+                    Text(stringResource(R.string.will_retain))
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "TLS / SSL",
+                text = stringResource(R.string.tls_ssl_label),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(checked = uiState.tlsEnabled, onCheckedChange = viewModel::onTlsEnabledChanged)
-                Text("Enable TLS")
+                Text(stringResource(R.string.enable_tls))
             }
             if (uiState.tlsEnabled) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(checked = uiState.tlsTrustAll, onCheckedChange = viewModel::onTlsTrustAllChanged)
-                    Text("Trust all certificates")
+                    Text(stringResource(R.string.trust_all_certs))
                 }
             }
 
-            uiState.error?.let {
+            if (uiState.validationError) {
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = it, color = MaterialTheme.colorScheme.error)
+                Text(text = stringResource(R.string.name_host_required), color = MaterialTheme.colorScheme.error)
             }
 
-            uiState.connectResult?.let {
+            uiState.connectSuccess?.let { success ->
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = it, color = MaterialTheme.colorScheme.primary)
+                if (success) {
+                    Text(text = stringResource(R.string.connected_success), color = MaterialTheme.colorScheme.primary)
+                } else {
+                    Text(
+                        text = stringResource(R.string.failed) + (uiState.connectionError?.let { ": $it" } ?: ""),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -226,7 +235,7 @@ fun ConnectionSettingsScreen(
                 onClick = viewModel::saveAndConnect,
                 modifier = Modifier.fillMaxWidth().height(48.dp)
             ) {
-                Text("Save & Connect")
+                Text(stringResource(R.string.save_and_connect))
             }
 
             Spacer(modifier = Modifier.height(24.dp))

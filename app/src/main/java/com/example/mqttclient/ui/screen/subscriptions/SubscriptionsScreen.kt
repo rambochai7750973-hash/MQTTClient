@@ -31,8 +31,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.example.mqttclient.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mqttclient.data.model.ConnectionState
@@ -63,7 +65,7 @@ fun SubscriptionsScreen(
                     value = uiState.newTopic,
                     onValueChange = viewModel::onTopicChanged,
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Topic") },
+                    label = { Text(stringResource(R.string.topic)) },
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyMedium.copy(
                         fontFamily = FontFamily.Monospace
@@ -83,13 +85,13 @@ fun SubscriptionsScreen(
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Subscribe")
+                    Text(stringResource(R.string.subscribe))
                 }
             }
         }
 
         Text(
-            text = "Subscriptions (${uiState.subscriptions.size})",
+            text = stringResource(R.string.subscriptions_count, uiState.subscriptions.size),
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
         )
@@ -97,8 +99,8 @@ fun SubscriptionsScreen(
         if (uiState.subscriptions.isEmpty()) {
             EmptyStateView(
                 icon = Icons.Default.BookmarkBorder,
-                title = "No subscriptions",
-                subtitle = "Enter a topic above and tap Subscribe"
+                title = stringResource(R.string.no_subscriptions),
+                subtitle = stringResource(R.string.enter_topic_hint)
             )
         } else {
             LazyColumn(
@@ -127,7 +129,7 @@ fun SubscriptionsScreen(
                                 contentAlignment = Alignment.CenterEnd
                             ) {
                                 Text(
-                                    text = "Unsubscribe",
+                                    text = stringResource(R.string.unsubscribe),
                                     color = Color.White,
                                     style = MaterialTheme.typography.labelLarge
                                 )

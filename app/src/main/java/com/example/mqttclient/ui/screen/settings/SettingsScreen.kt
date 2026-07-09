@@ -24,7 +24,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.mqttclient.R
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
@@ -39,15 +41,15 @@ fun SettingsScreen(
             .padding(16.dp)
     ) {
         Text(
-            text = "Settings",
+            text = stringResource(R.string.settings_title),
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
         SettingsItem(
             icon = Icons.Default.Storage,
-            title = "Connection Configurations",
-            subtitle = "Manage saved broker connections",
+            title = stringResource(R.string.connection_configs),
+            subtitle = stringResource(R.string.manage_configs),
             onClick = onNavigateToConfigs
         )
 
@@ -55,8 +57,8 @@ fun SettingsScreen(
 
         SettingsItem(
             icon = Icons.Default.Description,
-            title = "Logs",
-            subtitle = "View connection and error logs",
+            title = stringResource(R.string.logs),
+            subtitle = stringResource(R.string.view_logs_subtitle),
             onClick = onNavigateToLogs
         )
 
@@ -64,8 +66,8 @@ fun SettingsScreen(
 
         SettingsItem(
             icon = Icons.Default.Info,
-            title = "About",
-            subtitle = "Version 1.0.0",
+            title = stringResource(R.string.about),
+            subtitle = stringResource(R.string.version_info),
             onClick = { }
         )
     }

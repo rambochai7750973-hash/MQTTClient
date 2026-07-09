@@ -26,7 +26,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.mqttclient.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mqttclient.data.model.ConnectionState
@@ -64,12 +66,12 @@ fun MessagesScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp, vertical = 8.dp),
-            placeholder = { Text("Search topic...") },
+            placeholder = { Text(stringResource(R.string.search_topic_placeholder)) },
             singleLine = true,
             trailingIcon = {
                 if (uiState.searchQuery.isNotEmpty()) {
                     IconButton(onClick = { viewModel.onSearchQueryChanged("") }) {
-                        Icon(Icons.Default.Clear, contentDescription = "Clear")
+                        Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.clear))
                     }
                 }
             }
@@ -82,13 +84,13 @@ fun MessagesScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "${uiState.messages.size} messages",
+                text = stringResource(R.string.messages_count, uiState.messages.size),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             if (uiState.messages.isNotEmpty()) {
                 Text(
-                    text = "Clear all",
+                    text = stringResource(R.string.clear_all),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(horizontal = 8.dp)
@@ -103,15 +105,15 @@ fun MessagesScreen(
                 if (uiState.connectionState is ConnectionState.Disconnected) {
                     EmptyStateView(
                         icon = Icons.Default.CloudOff,
-                        title = "Not connected",
-                        subtitle = "Connect to an MQTT broker to start receiving messages",
+                        title = stringResource(R.string.not_connected),
+                        subtitle = stringResource(R.string.connect_hint),
                         modifier = Modifier.align(Alignment.Center)
                     )
                 } else {
                     EmptyStateView(
                         icon = Icons.Default.Inbox,
-                        title = "No messages yet",
-                        subtitle = "Subscribe to a topic to receive messages",
+                        title = stringResource(R.string.no_messages),
+                        subtitle = stringResource(R.string.subscribe_hint),
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }

@@ -15,8 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.example.mqttclient.R
 import com.example.mqttclient.data.model.MqttMessage
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,7 +54,7 @@ fun PayloadBottomSheet(
                 .verticalScroll(rememberScrollState())
         ) {
             Text(
-                text = "Topic: ${message.topic}",
+                text = "${stringResource(R.string.topic)}: ${message.topic}",
                 style = MaterialTheme.typography.titleMedium,
                 fontFamily = FontFamily.Monospace,
                 color = MaterialTheme.colorScheme.primary
@@ -60,7 +62,7 @@ fun PayloadBottomSheet(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "QoS ${message.qos}  •  ${if (message.retained) "Retained  •  " else ""}${formatTimestamp(message.timestamp)}",
+                text = "${stringResource(R.string.qos)} ${message.qos}  •  ${if (message.retained) "${stringResource(R.string.retained_indicator)}  •  " else ""}${formatTimestamp(message.timestamp)}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -70,7 +72,7 @@ fun PayloadBottomSheet(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Payload (${message.payload.size} bytes):",
+                text = stringResource(R.string.payload_bytes, message.payload.size),
                 style = MaterialTheme.typography.labelLarge
             )
             Spacer(modifier = Modifier.height(8.dp))

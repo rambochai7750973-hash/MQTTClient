@@ -15,6 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import com.example.mqttclient.R
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -31,16 +33,16 @@ import com.example.mqttclient.ui.screen.settings.SettingsScreen
 import com.example.mqttclient.ui.screen.subscriptions.SubscriptionsScreen
 
 data class BottomNavItem(
-    val label: String,
+    val labelResId: Int,
     val icon: ImageVector,
     val screen: Screen
 )
 
 val bottomNavItems = listOf(
-    BottomNavItem("Messages", Icons.Default.Email, Screen.Messages),
-    BottomNavItem("Subscriptions", Icons.Default.Subscriptions, Screen.Subscriptions),
-    BottomNavItem("Publish", Icons.Default.Send, Screen.Publish),
-    BottomNavItem("Settings", Icons.Default.Settings, Screen.Settings)
+    BottomNavItem(R.string.tab_messages, Icons.Default.Email, Screen.Messages),
+    BottomNavItem(R.string.tab_subscriptions, Icons.Default.Subscriptions, Screen.Subscriptions),
+    BottomNavItem(R.string.tab_publish, Icons.Default.Send, Screen.Publish),
+    BottomNavItem(R.string.tab_settings, Icons.Default.Settings, Screen.Settings)
 )
 
 @Composable
@@ -60,8 +62,8 @@ fun NavGraph() {
                             it.route == item.screen.route
                         } == true
                         NavigationBarItem(
-                            icon = { Icon(item.icon, contentDescription = item.label) },
-                            label = { Text(item.label) },
+                            icon = { Icon(item.icon, contentDescription = stringResource(item.labelResId)) },
+                            label = { Text(stringResource(item.labelResId)) },
                             selected = selected,
                             onClick = {
                                 navController.navigate(item.screen.route) {

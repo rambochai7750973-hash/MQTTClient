@@ -6,6 +6,7 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.mqttclient.MainActivity
+import com.example.mqttclient.R
 
 class NotificationHelper(private val channelId: String) {
 
@@ -22,8 +23,8 @@ class NotificationHelper(private val channelId: String) {
         )
 
         return NotificationCompat.Builder(context, channelId)
-            .setContentTitle("MQTT Client")
-            .setContentText("Connected to $serverUri")
+            .setContentTitle(context.getString(R.string.notification_mqtt_title))
+            .setContentText(context.getString(R.string.notification_connected_to) + serverUri)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
@@ -33,8 +34,8 @@ class NotificationHelper(private val channelId: String) {
 
     fun buildDisconnectedNotification(context: android.content.Context): Notification {
         return NotificationCompat.Builder(context, channelId)
-            .setContentTitle("MQTT Client")
-            .setContentText("Disconnected")
+            .setContentTitle(context.getString(R.string.notification_mqtt_title))
+            .setContentText(context.getString(R.string.notification_disconnected_text))
             .setSmallIcon(android.R.drawable.ic_dialog_alert)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
@@ -43,10 +44,10 @@ class NotificationHelper(private val channelId: String) {
     fun createNotificationChannel(context: android.content.Context) {
         val channel = android.app.NotificationChannel(
             channelId,
-            "MQTT Connection",
+            context.getString(R.string.notification_channel_name),
             android.app.NotificationManager.IMPORTANCE_LOW
         ).apply {
-            description = "Shows MQTT connection status"
+            description = context.getString(R.string.notification_channel_desc)
             setShowBadge(false)
         }
         val notificationManager =

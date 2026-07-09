@@ -30,8 +30,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.example.mqttclient.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mqttclient.data.model.ConnectionConfig
@@ -50,25 +52,25 @@ fun SavedConfigsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Saved Configurations") },
+                title = { Text(stringResource(R.string.saved_configs)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.nav_back))
                     }
                 }
             )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { onEditConfig(-1L) }) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_label))
             }
         }
     ) { padding ->
         if (uiState.configs.isEmpty()) {
             EmptyStateView(
                 icon = Icons.Default.CloudQueue,
-                title = "No saved configurations",
-                subtitle = "Tap + to add a new connection configuration",
+                title = stringResource(R.string.no_configs),
+                subtitle = stringResource(R.string.tap_to_add),
                 modifier = Modifier.padding(padding)
             )
         } else {
@@ -92,9 +94,9 @@ fun SavedConfigsScreen(
 
         uiState.showDeleteConfirm?.let { config ->
             ConfirmDialog(
-                title = "Delete Configuration",
-                message = "Are you sure you want to delete \"${config.name}\"?",
-                confirmText = "Delete",
+                title = stringResource(R.string.delete_config_title),
+                message = stringResource(R.string.delete_config_message, config.name),
+                confirmText = stringResource(R.string.delete),
                 onConfirm = {
                     viewModel.deleteConfig(config)
                     viewModel.dismissDeleteConfirm()
@@ -139,12 +141,12 @@ private fun ConfigCard(
                 )
             }
             IconButton(onClick = onEdit) {
-                Icon(Icons.Default.Add, contentDescription = "Edit")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.edit_label))
             }
             IconButton(onClick = onDelete) {
                 Icon(
                     Icons.Default.Delete,
-                    contentDescription = "Delete",
+                    contentDescription = stringResource(R.string.delete),
                     tint = MaterialTheme.colorScheme.error
                 )
             }
