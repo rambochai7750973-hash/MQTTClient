@@ -95,7 +95,6 @@ class MqttManager @Inject constructor(
                     MqttException.REASON_CODE_BROKER_UNAVAILABLE -> "Broker unavailable"
                     MqttException.REASON_CODE_CLIENT_TIMEOUT -> "Connection timeout"
                     MqttException.REASON_CODE_FAILED_AUTHENTICATION -> "Authentication failed"
-                    MqttException.REASON_CODE_NOT_CONNECTED -> "Not connected"
                     else -> e.message ?: "Unknown error"
                 },
                 throwable = e

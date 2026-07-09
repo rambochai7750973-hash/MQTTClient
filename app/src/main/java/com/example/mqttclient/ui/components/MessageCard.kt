@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.mqttclient.data.model.MqttMessage
 import com.example.mqttclient.ui.theme.ConnectedGreen
+import com.example.mqttclient.ui.theme.ConnectingYellow
 import com.example.mqttclient.ui.theme.DisconnectedRed
 
 @OptIn(ExperimentalFoundationApi::class)
