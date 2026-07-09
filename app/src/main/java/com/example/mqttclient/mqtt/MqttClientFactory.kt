@@ -27,11 +27,12 @@ class MqttClientFactory @Inject constructor() {
             maxReconnectDelay = config.reconnectIntervalSec * 1000
 
             if (config.willTopic != null) {
-                val willMessage = org.eclipse.paho.client.mqttv3.MqttMessage()
-                willMessage.payload = (config.willPayload ?: "").toByteArray()
-                willMessage.qos = config.willQos
-                willMessage.isRetained = config.willRetain
-                setWill(config.willTopic, willMessage)
+                setWill(
+                    config.willTopic,
+                    (config.willPayload ?: "").toByteArray(),
+                    config.willQos,
+                    config.willRetain
+                )
             }
         }
     }

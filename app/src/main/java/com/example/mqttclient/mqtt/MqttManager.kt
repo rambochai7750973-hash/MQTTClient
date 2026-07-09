@@ -92,9 +92,9 @@ class MqttManager @Inject constructor(
         } catch (e: MqttException) {
             _connectionState.value = ConnectionState.Error(
                 reason = when (e.reasonCode) {
-                    MqttException.REASON_CODE_BROKER_UNAVAILABLE -> "Broker unavailable"
-                    MqttException.REASON_CODE_CLIENT_TIMEOUT -> "Connection timeout"
-                    MqttException.REASON_CODE_FAILED_AUTHENTICATION -> "Authentication failed"
+                    MqttException.REASON_CODE_BROKER_UNAVAILABLE.toShort() -> "Broker unavailable"
+                    MqttException.REASON_CODE_CLIENT_TIMEOUT.toShort() -> "Connection timeout"
+                    MqttException.REASON_CODE_FAILED_AUTHENTICATION.toShort() -> "Authentication failed"
                     else -> e.message ?: "Unknown error"
                 },
                 throwable = e
