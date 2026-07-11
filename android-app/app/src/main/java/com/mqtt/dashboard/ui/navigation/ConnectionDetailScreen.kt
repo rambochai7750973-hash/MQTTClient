@@ -38,6 +38,7 @@ import com.mqtt.dashboard.data.mqtt.ConnectionState
 import com.mqtt.dashboard.data.mqtt.MqttConnectionConfig
 import com.mqtt.dashboard.data.mqtt.MqttManager
 import com.mqtt.dashboard.data.repository.MqttRepository
+import androidx.compose.runtime.livedata.observeAsState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -191,14 +192,3 @@ fun ConnectionDetailScreen(
     }
 }
 
-private fun <T> androidx.compose.runtime.getValue(
-    liveData: androidx.lifecycle.LiveData<T>
-): T? {
-    val state = androidx.compose.runtime.remember { mutableStateOf(liveData.value) }
-    androidx.compose.runtime.DisposableEffect(liveData) {
-        val observer = androidx.lifecycle.Observer<T> { state.value = it }
-        liveData.observeForever(observer)
-        onDispose { liveData.removeObserver(observer) }
-    }
-    return state.value
-}

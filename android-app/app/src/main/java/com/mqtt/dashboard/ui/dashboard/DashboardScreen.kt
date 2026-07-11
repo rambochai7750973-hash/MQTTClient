@@ -83,7 +83,7 @@ fun DashboardScreen(
                     .padding(padding)
                     .padding(32.dp),
                 verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Arrangement.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = "No widgets yet",

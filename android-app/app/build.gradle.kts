@@ -67,6 +67,7 @@ dependencies {
 
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.6")
+    implementation("androidx.compose.runtime:runtime-livedata")
 
     // Room
     implementation("androidx.room:room-runtime:2.6.1")
