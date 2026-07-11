@@ -25,18 +25,19 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.Observer
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mqtt.dashboard.data.local.ConnectionEntity
 import com.mqtt.dashboard.data.mqtt.ConnectionState
 import com.mqtt.dashboard.data.mqtt.MqttConnectionConfig
-import com.mqtt.dashboard.data.mqtt.MqttManager
 import com.mqtt.dashboard.data.repository.MqttRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -52,8 +53,16 @@ fun ConnectionDetailScreen(
     onBack: () -> Unit
 ) {
     var connection by remember { mutableStateOf<ConnectionEntity?>(null) }
-    val mqttManager = remember { MqttManager(com.mqtt.dashboard.MqttDashboardApp.instance) }
-    val connState by mqttManager.connectionState.observeAsState()
+    val mqttManager = repository.mqttManager
+    var connState by remember { mutableStateOf(mqttManager.connectionState.value) }
+    DisposableEffect(mqttManager) {
+        val observer = Observer<ConnectionState> { connState = it }
+        mqttManager.connectionState.observeForever(observer)
+        onDispose {
+            mqttManager.connectionState.removeObserver(observer)
+            mqttManager.disconnect()
+        }
+    }
 
     LaunchedEffect(connectionId) {
         val conn = withContext(Dispatchers.IO) {
@@ -85,13 +94,13 @@ fun ConnectionDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(connection?.name ?: "Connection") },
+                title = { Text(connection?.name ?: "连接") },
                 navigationIcon = {
                     IconButton(onClick = {
                         mqttManager.disconnect()
                         onBack()
                     }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "返回")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -112,10 +121,10 @@ fun ConnectionDetailScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             val statusText = when (connState) {
-                ConnectionState.CONNECTED -> "Connected"
-                ConnectionState.CONNECTING -> "Connecting..."
-                ConnectionState.ERROR -> "Connection Error"
-                else -> "Disconnected"
+                ConnectionState.CONNECTED -> "已连接"
+                ConnectionState.CONNECTING -> "连接中..."
+                ConnectionState.ERROR -> "连接错误"
+                else -> "已断开"
             }
             val statusColor = when (connState) {
                 ConnectionState.CONNECTED -> MaterialTheme.colorScheme.secondary
@@ -156,7 +165,7 @@ fun ConnectionDetailScreen(
                 ) {
                     Icon(Icons.Default.Subscriptions, contentDescription = null,
                         modifier = Modifier.size(24.dp))
-                    Text("Subscribe", modifier = Modifier.padding(start = 8.dp))
+                    Text("订阅", modifier = Modifier.padding(start = 8.dp))
                 }
 
                 Button(
@@ -170,7 +179,7 @@ fun ConnectionDetailScreen(
                 ) {
                     Icon(Icons.Default.Publish, contentDescription = null,
                         modifier = Modifier.size(24.dp))
-                    Text("Publish", modifier = Modifier.padding(start = 8.dp))
+                    Text("发布", modifier = Modifier.padding(start = 8.dp))
                 }
 
                 Button(
@@ -184,21 +193,9 @@ fun ConnectionDetailScreen(
                 ) {
                     Icon(Icons.Default.Dashboard, contentDescription = null,
                         modifier = Modifier.size(24.dp))
-                    Text("Dashboard", modifier = Modifier.padding(start = 8.dp))
+                    Text("仪表盘", modifier = Modifier.padding(start = 8.dp))
                 }
             }
         }
     }
-}
-
-private fun <T> androidx.compose.runtime.getValue(
-    liveData: androidx.lifecycle.LiveData<T>
-): T? {
-    val state = androidx.compose.runtime.remember { mutableStateOf(liveData.value) }
-    androidx.compose.runtime.DisposableEffect(liveData) {
-        val observer = androidx.lifecycle.Observer<T> { state.value = it }
-        liveData.observeForever(observer)
-        onDispose { liveData.removeObserver(observer) }
-    }
-    return state.value
 }

@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mqtt.dashboard.data.repository.MqttRepository
@@ -46,7 +47,7 @@ fun DashboardScreen(
     repository: MqttRepository,
     onBack: () -> Unit
 ) {
-    val activeId = com.mqtt.dashboard.ui.navigation.ConnectionState().activeConnectionId ?: return
+    val activeId = repository.getCurrentConnectionId()
     val widgets by repository.getWidgets(activeId).collectAsState(initial = emptyList())
     val scope = rememberCoroutineScope()
     var showAddDialog by remember { mutableStateOf(false) }
@@ -54,10 +55,10 @@ fun DashboardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Dashboard") },
+                title = { Text("仪表盘") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "返回")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -72,7 +73,7 @@ fun DashboardScreen(
                 onClick = { showAddDialog = true },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Widget")
+                Icon(Icons.Default.Add, contentDescription = "添加组件")
             }
         }
     ) { padding ->
@@ -83,10 +84,10 @@ fun DashboardScreen(
                     .padding(padding)
                     .padding(32.dp),
                 verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Arrangement.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "No widgets yet",
+                    text = "暂无组件",
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
@@ -107,7 +108,14 @@ fun DashboardScreen(
                         name = widget.name,
                         topic = widget.topic,
                         configJson = widget.configJson,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        onPublish = { topic, payload ->
+                            scope.launch {
+                                withContext(Dispatchers.IO) {
+                                    repository.mqttManager.publish(topic, payload)
+                                }
+                            }
+                        }
                     )
                 }
             }
@@ -148,14 +156,14 @@ private fun AddWidgetDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add Widget") },
+        title = { Text("添加组件") },
         text = {
             Column {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Widget Name") },
-                    placeholder = { Text("Temperature") },
+                    label = { Text("组件名称") },
+                    placeholder = { Text("温度") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -165,7 +173,7 @@ private fun AddWidgetDialog(
                 OutlinedTextField(
                     value = topic,
                     onValueChange = { topic = it },
-                    label = { Text("Topic") },
+                    label = { Text("主题") },
                     placeholder = { Text("sensor/temp") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
@@ -173,7 +181,7 @@ private fun AddWidgetDialog(
                 androidx.compose.foundation.layout.Spacer(
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
-                Text("Type: $selectedType", style = MaterialTheme.typography.bodyMedium)
+                Text("类型: $selectedType", style = MaterialTheme.typography.bodyMedium)
             }
         },
         confirmButton = {
@@ -182,12 +190,12 @@ private fun AddWidgetDialog(
                     onConfirm(selectedType, name, topic)
                 }
             }) {
-                Text("Add")
+                Text("添加")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("取消")
             }
         }
     )

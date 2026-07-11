@@ -40,7 +40,7 @@ class MqttManager(private val context: Context) {
     private val callback = object : MqttCallback {
         override fun connectionLost(cause: Throwable?) {
             _connectionState.postValue(ConnectionState.DISCONNECTED)
-            _errorMessage.postValue("Connection lost: ${cause?.message}")
+            _errorMessage.postValue("连接丢失：${cause?.message}")
         }
 
         override fun messageArrived(topic: String?, message: MqttMessage?) {
@@ -71,12 +71,9 @@ class MqttManager(private val context: Context) {
             val options = MqttConnectOptions().apply {
                 userName = config.username.ifBlank { null }
                 password = config.password.ifBlank { null }?.toCharArray()
-                cleanSession = config.cleanSession
+                setCleanSession(config.cleanSession)
                 connectionTimeout = config.connectionTimeout
                 keepAliveInterval = config.keepAliveInterval
-                if (config.authToken.isNotBlank()) {
-                    setCustomHeader("Authorization", "Bearer ${config.authToken}")
-                }
             }
 
             client?.connect(options, null, object : IMqttActionListener {
@@ -87,32 +84,36 @@ class MqttManager(private val context: Context) {
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
                     _connectionState.postValue(ConnectionState.ERROR)
-                    _errorMessage.postValue("Connect failed: ${exception?.message}")
+                    _errorMessage.postValue("连接失败：${exception?.message}")
                 }
             })
         } catch (e: MqttException) {
             _connectionState.postValue(ConnectionState.ERROR)
-            _errorMessage.postValue("MQTT error: ${e.message}")
+            _errorMessage.postValue("MQTT 错误：${e.message}")
         }
     }
 
     fun disconnect() {
         try {
-            client?.unregisterResources()
             client?.disconnect()
+            client?.unregisterResources()
         } catch (_: Exception) {}
         client = null
         _connectionState.postValue(ConnectionState.DISCONNECTED)
     }
 
     fun subscribe(topic: String, qos: Int = 0) {
+        if (!isConnected()) {
+            _errorMessage.postValue("未连接，无法订阅")
+            return
+        }
         client?.subscribe(topic, qos, null, object : IMqttActionListener {
             override fun onSuccess(asyncActionToken: IMqttToken?) {
                 _errorMessage.postValue(null)
             }
 
             override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                _errorMessage.postValue("Subscribe failed: ${exception?.message}")
+                _errorMessage.postValue("订阅失败：${exception?.message}")
             }
         })
     }
@@ -122,6 +123,10 @@ class MqttManager(private val context: Context) {
     }
 
     fun publish(topic: String, payload: String, qos: Int = 0, retained: Boolean = false) {
+        if (!isConnected()) {
+            _errorMessage.postValue("未连接，无法发布")
+            return
+        }
         val message = MqttMessage(payload.toByteArray()).apply {
             this.qos = qos
             isRetained = retained
@@ -139,7 +144,7 @@ class MqttManager(private val context: Context) {
             }
 
             override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                _errorMessage.postValue("Publish failed: ${exception?.message}")
+                _errorMessage.postValue("发布失败：${exception?.message}")
             }
         })
     }
@@ -162,6 +167,9 @@ class MqttManager(private val context: Context) {
         }
         if (!config.useTls) {
             queryParams.add("tls=false")
+        }
+        if (config.authToken.isNotBlank()) {
+            queryParams.add("token=${config.authToken}")
         }
 
         val query = if (queryParams.isNotEmpty()) "?${queryParams.joinToString("&")}" else ""

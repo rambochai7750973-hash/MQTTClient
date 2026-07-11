@@ -53,7 +53,8 @@ fun MqttWidget(
     name: String,
     topic: String,
     configJson: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onPublish: (topic: String, payload: String) -> Unit = { _, _ -> }
 ) {
     Card(
         modifier = modifier,
@@ -81,8 +82,8 @@ fun MqttWidget(
             when (type) {
                 WidgetType.GAUGE -> GaugeContent()
                 WidgetType.TEXT -> TextContent()
-                WidgetType.BUTTON -> ButtonContent()
-                WidgetType.SWITCH -> SwitchContent()
+                WidgetType.BUTTON -> ButtonContent(topic = topic, onPublish = onPublish)
+                WidgetType.SWITCH -> SwitchContent(topic = topic, onPublish = onPublish)
                 WidgetType.CHART -> ChartContent()
                 WidgetType.LED -> LedContent()
             }
@@ -146,11 +147,11 @@ private fun TextContent() {
 }
 
 @Composable
-private fun ButtonContent() {
+private fun ButtonContent(topic: String, onPublish: (String, String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { }
+            .clickable { onPublish(topic, "toggle") }
             .background(Blue800, RoundedCornerShape(8.dp))
             .padding(12.dp),
         horizontalArrangement = Arrangement.Center,
@@ -163,12 +164,12 @@ private fun ButtonContent() {
             modifier = Modifier.size(20.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Text("Send", color = Color.White, style = MaterialTheme.typography.labelLarge)
+        Text("发送", color = Color.White, style = MaterialTheme.typography.labelLarge)
     }
 }
 
 @Composable
-private fun SwitchContent() {
+private fun SwitchContent(topic: String, onPublish: (String, String) -> Unit) {
     var checked by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -176,11 +177,14 @@ private fun SwitchContent() {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            if (checked) "ON" else "OFF",
+            if (checked) "开" else "关",
             style = MaterialTheme.typography.titleLarge,
             color = if (checked) Green500 else Color.Gray
         )
-        Switch(checked = checked, onCheckedChange = { checked = it })
+        Switch(checked = checked, onCheckedChange = {
+            checked = it
+            onPublish(topic, if (it) "on" else "off")
+        })
     }
 }
 
