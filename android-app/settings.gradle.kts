@@ -11,6 +11,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url = uri("https://repo.eclipse.org/content/repositories/paho-snapshots/") }
+        maven { url = uri("https://jitpack.io") }
     }
 }
 

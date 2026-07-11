@@ -14,7 +14,7 @@
         android:theme="@style/Theme.MqttDashboard"
         android:networkSecurityConfig="@xml/network_security_config">
 
-        <service android:name="org.eclipse.paho.android.service.MqttService" />
+        <service android:name="info.mqtt.android.service.MqttService" />
 
         <activity
             android:name=".MainActivity"

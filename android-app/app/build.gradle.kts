@@ -75,9 +75,7 @@ dependencies {
 
     // MQTT
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
-    implementation("org.eclipse.paho:org.eclipse.paho.android.service:1.1.1") {
-        exclude(group = "com.google.android", module = "support-v4")
-    }
+    implementation("com.github.hannesa2:paho.mqtt.android:4.3.beta2")
 
     // Gson
     implementation("com.google.code.gson:gson:2.10.1")
