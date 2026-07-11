@@ -1,2 +1,0 @@
--keep class org.eclipse.paho.** { *; }
--dontwarn org.eclipse.paho.**
