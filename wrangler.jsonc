@@ -1,0 +1,10 @@
+{
+  "name": "mqtt-websocket-bridge",
+  "main": "src/index.js",
+  "compatibility_date": "2024-12-01",
+  "vars": {
+    "MQTT_BROKER_HOST": "broker.emqx.io",
+    "MQTT_BROKER_PORT": "1883",
+    "MQTT_USE_TLS": "false"
+  }
+}

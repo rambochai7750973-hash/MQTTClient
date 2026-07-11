@@ -1,0 +1,67 @@
+=========================================
+  安卓 MQTT Dashboard App — 开发提示词
+  基于 Cloudflare MQTT WebSocket Bridge
+=========================================
+
+一、项目概述
+-----------
+开发一个安卓原生 App (Kotlin + Jetpack Compose)，
+通过 Cloudflare Worker (wss://) 连接 MQTT Broker，
+与 ESP8266 PLC 实现双向通信。
+
+二、数据流架构
+--------------
+ESP8266 ←→ MQTT Broker ←→ Cloudflare Worker (WS桥接) ←→ 安卓 App
+                                  (wss://xxx.workers.dev/mqtt)
+
+三、核心功能
+-----------
+1. 连接管理
+   - 配置 Worker 地址 / 端口 443 / 路径 /mqtt
+   - 支持动态 Broker (?host=&port=&tls=)
+   - 连接状态指示 / 自动重连
+   - 保存多个连接配置
+
+2. 订阅 & 消息列表
+   - 输入 Topic 过滤器 (支持 # 和 +)
+   - 实时显示消息 (时间 / Topic / Payload)
+   - 本地持久化消息
+
+3. 发布消息
+   - 输入 Topic / Payload / QoS / Retain
+
+4. Dashboard 面板
+   - Gauge（仪表盘）— 数值显示
+   - Text（文本框）— 任意数据
+   - Button（按钮）— 预设指令发布
+   - Switch（开关）— 开关量控制
+   - Chart（图表）— 历史折线
+   - LED（指示灯）— 状态指示
+
+四、技术选型
+-----------
+- 语言: Kotlin
+- UI: Jetpack Compose
+- MQTT: Eclipse Paho Android Service
+- 存储: Room (SQLite)
+- 导航: Navigation Compose
+- 架构: MVVM + Repository
+
+五、MQTT 连接示例
+-----------------
+  serverURI = "wss://你的worker.workers.dev/mqtt"
+  val options = MqttConnectOptions().apply {
+      userName = "admin"      // Broker 用户名（可选）
+      password = "public"     // Broker 密码（可选）
+      cleanSession = true
+      connectionTimeout = 10
+      keepAliveInterval = 20
+  }
+
+六、Cloudflare Worker 端点
+--------------------------
+  WSS 端点: /mqtt
+  URL 参数: ?host=&port=&tls=
+  鉴权: Authorization: Bearer <token>
+  健康检查: GET /health
+  API 信息: GET /
