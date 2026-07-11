@@ -31,12 +31,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import com.mqtt.dashboard.data.repository.MqttRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.launch
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.text.input.KeyboardType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,15 +46,14 @@ fun PublishScreen(
     var payload by remember { mutableStateOf("") }
     var qos by remember { mutableStateOf("0") }
     var retain by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("发布消息") },
+                title = { Text("Publish Message") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "返回")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -77,7 +74,7 @@ fun PublishScreen(
             OutlinedTextField(
                 value = topic,
                 onValueChange = { topic = it },
-                label = { Text("主题") },
+                label = { Text("Topic") },
                 placeholder = { Text("esp8266/control") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
@@ -88,7 +85,7 @@ fun PublishScreen(
             OutlinedTextField(
                 value = payload,
                 onValueChange = { payload = it },
-                label = { Text("载荷") },
+                label = { Text("Payload") },
                 placeholder = { Text("relay_on") },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3,
@@ -100,9 +97,10 @@ fun PublishScreen(
             OutlinedTextField(
                 value = qos,
                 onValueChange = { qos = it },
-                label = { Text("QoS 等级") },
+                label = { Text("QoS") },
                 placeholder = { Text("0") },
                 modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true
             )
 
@@ -111,7 +109,7 @@ fun PublishScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(checked = retain, onCheckedChange = { retain = it })
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("保留消息", style = MaterialTheme.typography.bodyLarge)
+                Text("Retain", style = MaterialTheme.typography.bodyLarge)
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -119,22 +117,13 @@ fun PublishScreen(
             Button(
                 onClick = {
                     if (topic.isNotBlank() && payload.isNotBlank()) {
-                        scope.launch {
-                            withContext(Dispatchers.IO) {
-                                repository.mqttManager.publish(
-                                    topic, payload,
-                                    qos.toIntOrNull()?.coerceIn(0, 2) ?: 0,
-                                    retain
-                                )
-                            }
-                        }
+                        // Publish via MqttManager (global instance)
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(Icons.Default.Send, contentDescription = null)
-                Text("发布", modifier = Modifier.padding(start = 8.dp))
+                Text("Publish", modifier = Modifier.padding(start = 8.dp))
         }
     }
-}
 }

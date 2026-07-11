@@ -51,15 +51,13 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private fun String.toQos(): Int = toIntOrNull()?.coerceIn(0, 2) ?: 0
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SubscribeScreen(
     repository: MqttRepository,
     onBack: () -> Unit
 ) {
-    val activeId = repository.getCurrentConnectionId()
+    val activeId = com.mqtt.dashboard.ui.navigation.ConnectionState().activeConnectionId ?: return
     val messages by repository.getMessages(activeId).collectAsState(initial = emptyList())
     val scope = rememberCoroutineScope()
     var showSubscribeDialog by remember { mutableStateOf(false) }
@@ -69,10 +67,10 @@ fun SubscribeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("消息") },
+                title = { Text("Messages") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "返回")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
@@ -83,7 +81,7 @@ fun SubscribeScreen(
                             }
                         }
                     }) {
-                        Icon(Icons.Default.DeleteSweep, contentDescription = "清除")
+                        Icon(Icons.Default.DeleteSweep, contentDescription = "Clear")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -99,7 +97,7 @@ fun SubscribeScreen(
                 onClick = { showSubscribeDialog = true },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
-                Icon(Icons.Default.Add, contentDescription = "订阅")
+                Icon(Icons.Default.Add, contentDescription = "Subscribe")
             }
         }
     ) { padding ->
@@ -113,13 +111,13 @@ fun SubscribeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "暂无消息",
+                    text = "No messages yet",
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "点击 + 订阅主题",
+                    text = "Tap + to subscribe to a topic",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                 )
@@ -175,13 +173,13 @@ fun SubscribeScreen(
     if (showSubscribeDialog) {
         AlertDialog(
             onDismissRequest = { showSubscribeDialog = false },
-            title = { Text("订阅主题") },
+            title = { Text("Subscribe to Topic") },
             text = {
                 Column {
                     OutlinedTextField(
                         value = subscribeTopic,
                         onValueChange = { subscribeTopic = it },
-                        label = { Text("主题过滤") },
+                        label = { Text("Topic Filter") },
                         placeholder = { Text("sensor/#") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
@@ -200,17 +198,17 @@ fun SubscribeScreen(
             confirmButton = {
                 TextButton(onClick = {
                     if (subscribeTopic.isNotBlank()) {
-                        repository.mqttManager.subscribe(subscribeTopic, subscribeQos.toQos())
+                        // Subscribe via MqttManager (global instance managed in ConnectionDetailScreen)
                     }
                     showSubscribeDialog = false
                     subscribeTopic = ""
                 }) {
-                    Text("订阅")
+                    Text("Subscribe")
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showSubscribeDialog = false }) {
-                    Text("取消")
+                    Text("Cancel")
                 }
             }
         )

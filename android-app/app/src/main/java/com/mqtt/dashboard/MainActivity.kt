@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.mqtt.dashboard.data.mqtt.MqttManager
 import com.mqtt.dashboard.data.repository.MqttRepository
 import com.mqtt.dashboard.ui.navigation.MqttNavGraph
 import com.mqtt.dashboard.ui.theme.MqttDashboardTheme
@@ -17,7 +18,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val app = application as MqttDashboardApp
-        val repository = MqttRepository(app.database, app.mqttManager)
+        val mqttManager = MqttManager(applicationContext)
+        val repository = MqttRepository(app.database, mqttManager)
 
         repository.startListeningForMessages()
 

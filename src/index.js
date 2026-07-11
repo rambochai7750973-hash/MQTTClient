@@ -34,23 +34,18 @@ function getBrokerConfig(env, url) {
   return { host, port, tls };
 }
 
-function checkAuth(request, env, url) {
+function checkAuth(request, env) {
   const token = env.MQTT_AUTH_TOKEN;
   if (!token) return true;
   const auth = request.headers.get('Authorization');
-  if (auth === `Bearer ${token}`) return true;
-  const queryToken = url?.searchParams?.get('token');
-  if (queryToken === token) return true;
-  return false;
+  return auth === `Bearer ${token}`;
 }
 
 async function handleMqttWebSocket(request, env) {
   const corsCheck = handleOptions(request);
   if (corsCheck) return corsCheck;
 
-  const url = new URL(request.url);
-
-  if (!checkAuth(request, env, url)) {
+  if (!checkAuth(request, env)) {
     return jsonResponse({ error: 'Unauthorized' }, 401);
   }
 
@@ -58,6 +53,8 @@ async function handleMqttWebSocket(request, env) {
   if (!upgrade || upgrade.toLowerCase() !== 'websocket') {
     return jsonResponse({ error: 'This endpoint requires a WebSocket upgrade' }, 426);
   }
+
+  const url = new URL(request.url);
   const config = getBrokerConfig(env, url);
   const [client, server] = Object.values(new WebSocketPair());
 

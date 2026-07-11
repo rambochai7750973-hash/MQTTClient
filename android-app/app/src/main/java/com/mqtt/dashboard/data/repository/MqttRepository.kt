@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class MqttRepository(
     val database: AppDatabase,
-    val mqttManager: MqttManager
+    private val mqttManager: MqttManager
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
 
@@ -41,8 +41,6 @@ class MqttRepository(
     fun setCurrentConnectionId(id: Long) {
         currentConnectionId = id
     }
-
-    fun getCurrentConnectionId(): Long = currentConnectionId
 
     private fun determineDirection(event: MqttMessageEvent): String {
         return "inbound"
